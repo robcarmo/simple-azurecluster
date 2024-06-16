@@ -1,0 +1,5 @@
+apiVersion: v2
+name: sample-api
+description: A Helm chart for deploying the sample API
+version: 0.1.0
+appVersion: "1.0"
