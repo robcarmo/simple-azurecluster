@@ -240,9 +240,10 @@ Summary
 
 The CI/CD pipeline leverages GitHub Actions to automate the build, push, and deployment processes. Docker images are built and pushed to ACR, and the application is deployed to AKS using Helm charts. This setup ensures a streamlined and automated workflow for deploying updates to the sample API, with all necessary configurations and secrets managed securely within GitHub and Azure.
 
+
 Deployment and CI/CD Explanation
 
-This guide provides an overview of the deployment process and CI/CD pipeline setup for deploying a sample API to Azure Kubernetes Service (AKS) using Helm, Docker, and Terraform. It assumes that all necessary credentials, CLI tools, and secrets are already configured, and az login and other necessary commands have been executed.
+This guide provides an overview of the deployment process and CI/CD pipeline setup for deploying a sample API to Azure Kubernetes Service (AKS) using Helm, Docker, and Terraform. It assumes that all necessary credentials, CLI tools, and secrets are already configured, and az login and other necessary commands have been executed, including configuring your provider with your credentials.
 
 Deployment Steps
 
