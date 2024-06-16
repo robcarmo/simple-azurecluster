@@ -1,0 +1,10 @@
+postgresql:
+  enabled: false
+  postgresqlUsername: your_admin_username
+  postgresqlPassword: your_admin_password
+  postgresqlDatabase: your_database_name
+  service:
+    port: 5432
+  persistence:
+    enabled: true
+    size: 8Gi

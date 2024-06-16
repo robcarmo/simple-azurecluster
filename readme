@@ -1,3 +1,72 @@
+Based on the provided PDF, we can divide the deliverables into phases to manage the workflow efficiently. Here's a suggested breakdown:
+
+Phase 1: Planning and Setup
+Define User Story and Epic
+
+Create an informal user story to drive the deployment.
+Define the epic and list out the tasks necessary for the deployment.
+Initial Repository Setup
+
+Set up a Git repository with a structured approach for multiple environments.
+Prepare the initial documentation outlining the project scope and plan.
+
+Phase 2: Infrastructure as Code (IaC) with Terraform
+Terraform Code Development
+
+Write Terraform code to create necessary resources for the infrastructure.
+Ensure the repository structure supports potential multiple environments.
+Implement best practices for Terraform code organization and reuse.
+Database Configuration
+
+Configure the database for optimal performance.
+Set up monitoring for the database.
+Implement automated backups and disaster recovery procedures.
+
+Phase 3: Containerization and Orchestration
+Dockerfiles Creation
+
+Create Dockerfiles for the sample API and database.
+Ensure Dockerfiles follow best practices for security and efficiency.
+Helm Charts Development
+
+Write Helm charts to define, install, and manage the Kubernetes resources.
+Optionally, use Kustomize for resource configuration if preferred.
+
+Phase 4: Deployment and Testing
+Deploy to Azure Kubernetes Service (AKS)
+
+Deploy the infrastructure to Azure Kubernetes Service.
+Ensure the API is accessible from the outside while keeping the database internal.
+Testing and Validation
+
+Test the deployment to ensure it meets the functional requirements.
+Validate the performance and reliability of the infrastructure.
+Implement any necessary modifications based on testing feedback.
+
+
+Phase 5: Optional Enhancements
+CI/CD Implementation
+
+Set up a CI/CD pipeline to automate the deployment process.
+Implement GitOps practices for better deployment management.
+Monitoring and Logging
+
+Set up monitoring and log management for the infrastructure.
+Configure alerts for any potential issues in the deployment.
+
+Phase 6: Presentation and Review
+
+Prepare Presentation
+
+Explain the user story, design choices, and technical architecture in a zoom meeting.
+Optionally, demonstrate the functionality of the deployment.
+
+Submit GitHub Repository
+
+Share the GitHub repository with the technical interview panel at the requested time.
+
+
+
 User Story
 As a DevOps Engineer, I want to deploy a sample API with multiple replicas and its associated database using Azure Kubernetes Service (AKS), ensuring best practices in deployment, security, and performance, so that the application is accessible to users while the database remains secure and optimized.
 
@@ -51,3 +120,273 @@ Documentation
 Document all steps, configurations, and decisions in the README file.
 Include the user story and epic as part of the documentation.
 Ensure clear and concise documentation for future reference and review.
+
+
+Task 2- Directory Structure
+
+.github/
+├── workflows/
+│   ├── build-and-push-docker.yml
+│   └── deploy-to-aks.yml
+docker/
+├── api/
+│   ├── Dockerfile
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   └── requirements.txt
+helm/
+├── sample-api/
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   ├── templates/
+│       ├── deployment.yaml
+│       ├── service.yaml
+│       ├── netowrkpolicy.yaml
+├── postgresql/
+│   ├── Chart.yaml
+│   ├── values.yaml
+│   ├── templates/
+│       ├── deployment.yaml
+│       ├── service.yaml
+terraform/
+├── modules/
+│   ├── acr/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── aks/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── app-insights
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── database/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── storage
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── networking/
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── log-analytics/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+├── main.tf
+├── variables.tf
+└── outputs.tf
+
+
+Directory Structure Explanation
+.github/
+workflows/: Contains GitHub Actions workflows for CI/CD.
+
+docker/
+api/: Contains the Docker-related files for the API service.
+
+helm/
+sample-api/: Helm chart for deploying the sample API.
+postgresql/: Helm chart for deploying PostgreSQL.
+
+
+Terraform Modules Directory Structure
+acr/: Configures Azure Container Registry.
+aks/: Configures Azure Kubernetes Service.
+app-insights/: Configures Azure Application Insights.
+database/: Configures PostgreSQL database.
+storage/: Configures Azure Storage.
+networking/: Configures networking resources (VNet, Subnets, NSGs).
+log-analytics/: Configures Azure Log Analytics workspace.
+
+Each module directory contains the necessary Terraform files to configure a specific resource or set of resources, making the infrastructure code modular and reusable.
+
+CI/CD Pipeline Explanation
+
+1. Build and Push Docker Image
+This workflow is triggered by pushes to the main branch. It performs the following steps:
+
+Checkout Code: Retrieves the latest code from the repository.
+Set Up Docker: Configures Docker Buildx for building multi-platform images.
+Login to Azure: Authenticates with Azure using the credentials set up in the GitHub repository secrets.
+Login to ACR: Authenticates with Azure Container Registry.
+Build and Push Docker Image: Builds the Docker image for the sample API and pushes it to ACR.
+
+2. Deploy to AKS
+This workflow is triggered by pushes to the main branch. It performs the following steps:
+
+Checkout Code: Retrieves the latest code from the repository.
+Login to Azure: Authenticates with Azure using the credentials set up in the GitHub repository secrets.
+Set Up kubectl: Configures kubectl to interact with the AKS cluster.
+Get AKS Credentials: Retrieves the AKS cluster credentials to configure kubectl.
+Deploy to AKS: Uses Helm to deploy the sample API to the AKS cluster, referencing the Docker images stored in ACR.
+Deployment Process
+Build and Push Docker Image:
+
+The CI workflow builds the Docker image from the Dockerfile in the docker/api/ directory.
+The built image is tagged and pushed to Azure Container Registry.
+Deploy to AKS:
+
+The CD workflow retrieves the latest image from ACR.
+Helm is used to deploy the application to the AKS cluster, applying configurations specified in the Helm chart located in helm/sample-api/.
+
+Summary
+
+The CI/CD pipeline leverages GitHub Actions to automate the build, push, and deployment processes. Docker images are built and pushed to ACR, and the application is deployed to AKS using Helm charts. This setup ensures a streamlined and automated workflow for deploying updates to the sample API, with all necessary configurations and secrets managed securely within GitHub and Azure.
+
+Deployment and CI/CD Explanation
+
+This guide provides an overview of the deployment process and CI/CD pipeline setup for deploying a sample API to Azure Kubernetes Service (AKS) using Helm, Docker, and Terraform. It assumes that all necessary credentials, CLI tools, and secrets are already configured, and az login and other necessary commands have been executed.
+
+Deployment Steps
+
+Step 1: Infrastructure Setup with Terraform
+
+Initialize Terraform:
+
+Navigate to the Terraform directory and run the initialization command.
+
+
+terraform init
+
+Plan the Infrastructure:
+
+Generate and review the execution plan for the infrastructure deployment.
+
+terraform plan (choose your environment)
+
+Apply the Infrastructure Configuration:
+
+Apply the Terraform configuration to provision the infrastructure.
+
+terraform apply (choose your environment)
+
+This step creates the necessary resources, including the Azure Kubernetes Service (AKS) cluster, Azure Container Registry (ACR), and other required infrastructure components.
+
+Step 2: Build and Push Docker Image to ACR
+
+Build Docker Image:
+
+Build the Docker image for the sample API.
+
+docker build -t myacr.azurecr.io/sample-api:latest .
+
+Login to Azure Container Registry (ACR):
+
+Authenticate Docker to ACR.
+
+az acr login --name myacr
+
+Push Docker Image to ACR:
+
+Push the Docker image to the Azure Container Registry.
+
+docker push myacr.azurecr.io/sample-api:latest
+
+Step 3: Deploy Application to AKS with Helm
+
+Package the Helm Chart:
+
+Package your Helm chart to prepare it for deployment.
+
+helm package helm/sample-api
+
+Deploy the Helm Chart:
+
+Install the Helm chart to deploy your application to AKS.
+
+helm install sample-api ./sample-api-0.1.0.tgz
+
+Upgrade the Deployment (if needed):
+
+Use the upgrade command to apply updates to your deployment.
+
+helm upgrade sample-api ./sample-api-0.1.0.tgz
+Verify the Deployment:
+
+Check the status of your deployment to ensure everything is running correctly.
+
+helm status sample-api
+
+CI/CD Pipeline Explanation
+
+Build and Push Docker Image
+
+This workflow builds a Docker image for the sample API and pushes it to ACR. It is triggered by pushes to the main branch and performs the following steps:
+
+Checkout Code: Retrieves the latest code from the repository.
+Set Up Docker: Configures Docker Buildx for building multi-platform images.
+Login to Azure and ACR: Authenticates with Azure and ACR.
+Build and Push Docker Image: Builds the Docker image and pushes it to ACR.
+
+
+Deploy to AKS
+
+This workflow deploys the Docker image to AKS using Helm. It is triggered by pushes to the main branch and performs the following steps:
+
+
+Checkout Code: Retrieves the latest code from the repository.
+
+Login to Azure: Authenticates with Azure.
+
+Set Up kubectl: Configures kubectl to interact with the AKS cluster.
+
+Get AKS Credentials: Retrieves the AKS cluster credentials to configure kubectl.
+
+Deploy to AKS: Uses Helm to deploy the sample API to the AKS cluster, referencing the Docker images stored in ACR.
+
+Testing Steps
+
+1. Access the Application
+Once the deployment is complete, you can access your application via the public IP address assigned to the service.
+
+Get the Service Details:
+
+
+kubectl get services
+
+Note the External IP:
+
+Look for the EXTERNAL-IP column for your service. This is the IP address where your application is accessible.
+Access the Application:
+
+Open a web browser and navigate to the external IP address. You should see your application running.
+
+2. Verify Pod Status
+Ensure that all pods are running and healthy.
+
+Get the Pod Status:
+
+kubectl get pods
+
+Check Pod Logs:
+
+If any pods are not running correctly, check the logs for troubleshooting.
+
+kubectl logs <pod-name>
+
+3. Run Automated Tests
+You can set up automated tests as part of your CI/CD pipeline to ensure the application is functioning as expected.
+
+Define Tests:
+
+Use a testing framework appropriate for your application (e.g., PyTest for Python, Jest for Node.js).
+Run Tests Locally:
+
+Run tests locally to verify functionality.
+
+pytest
+
+Integrate Tests into CI/CD:
+
+Add a step in your GitHub Actions workflow to run tests after deploying to AKS.
+
+Summary
+
+This deployment process ensures that your sample API is built, pushed, and deployed in a streamlined manner using Terraform, Docker, and Helm. The CI/CD pipeline automates the build and deployment steps, leveraging GitHub Actions for continuous integration and deployment. Testing steps include verifying the application via the public IP, ensuring all pods are running correctly, and integrating automated tests into your CI/CD pipeline. This setup allows for efficient and scalable application deployment to Azure Kubernetes Service.
