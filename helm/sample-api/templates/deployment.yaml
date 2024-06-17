@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sample-api
-        image: myacrdev.azurecr.io/myapp:latest
+        image: myacrdev.azurecr.io/sample-api:latest
         ports:
         - containerPort: 80
         env:
