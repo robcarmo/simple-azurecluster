@@ -44,8 +44,8 @@ jobs:
       - name: Verify kubectl connection
         run: kubectl get nodes
 
-      - name: List Helm releases
-        run: helm list -A
+      # - name: List Helm releases
+      #   run: helm list -A
 
       # - name: Install or Upgrade Helm Release
       #   working-directory: helm
