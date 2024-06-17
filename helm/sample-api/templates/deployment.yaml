@@ -14,8 +14,23 @@ spec:
     spec:
       containers:
       - name: sample-api
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: myacrdev.azurecr.io/sample-api:latest
         ports:
         - containerPort: 80
+        env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+      imagePullSecrets:
+      - name: acr-secret
+
+

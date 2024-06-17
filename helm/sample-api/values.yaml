@@ -9,16 +9,13 @@ service:
   type: LoadBalancer
   port: 80
 
-ingress:
-  enabled: false
-  annotations: {}
-  hosts:
-    - host: chart-example.local
-      paths: []
-  tls: []
-
-resources: {}
-nodeSelector: {}
-tolerations: []
-affinity: {}
-
+postgresql:
+  enabled: true
+  postgresqlUsername: adminuser                # Admin username from your Terraform configuration or Azure CLI
+  postgresqlPassword: StrongPassword!123           # Admin password from your Terraform configuration
+  postgresqlDatabase: mydatabase-dev           # Database name retrieved from Azure
+  service:
+    port: 5432
+  persistence:
+    enabled: true
+    size: 8Gi
