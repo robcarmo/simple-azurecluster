@@ -17,9 +17,15 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Print Azure Login Info
+        run: |
+          echo "Subscription ID: $(az account show --query id -o tsv)"
+          echo "Tenant ID: $(az account show --query tenantId -o tsv)"
 
       - name: Set up Helm
         uses: azure/setup-helm@v1
+        with:
+          version: v3.9.4  
 
       - name: Install Kubectl
         uses: azure/setup-kubectl@v1
