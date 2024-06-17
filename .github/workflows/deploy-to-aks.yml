@@ -17,6 +17,13 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # New Step: Test Cluster Connection
+      - name: Verify kubectl connection
+        run: kubectl get nodes
+
+      # New Step: List Existing Releases
+      - name: List Helm releases
+        run: helm list 
 
       - name: Set up Helm
         uses: azure/setup-helm@v1
