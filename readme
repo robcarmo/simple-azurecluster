@@ -128,6 +128,7 @@ Task 2- Directory Structure
 ├── workflows/
 │   ├── build-and-push-docker.yml
 │   └── deploy-to-aks.yml
+k8config/
 docker/
 ├── api/
 │   ├── Dockerfile
@@ -195,6 +196,7 @@ helm/
 sample-api/: Helm chart for deploying the sample API.
 postgresql/: Helm chart for deploying PostgreSQL.
 
+k8config/ : Contains extra configs for app and k8s.
 
 Terraform Modules Directory Structure
 acr/: Configures Azure Container Registry.
