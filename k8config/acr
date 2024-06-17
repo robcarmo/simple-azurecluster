@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: acr-secret
+  namespace: default
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJteWFjcmRldi5henVyZWNvci5pbyI6eyJ1c2VybmFtZSI6Im15YWNyZGV2IiwicGFzc3dvcmQiOiJHRmIraUhZWjhHNG5VR1hxRVhXZy9uRHB6WlhWUlFCdTJBdTU5dHV5SUsrQUNSQ2VVUHBRIiwicGFzc3dvcmQyIjoicUQ2dkRZY1E3N3BzVndyaG54ZnpVazh4Yk9JN09PUlFKUTZ1VHFKemVNK0FDUkF2V3NVMCIsImF1dGgiOiJkWE5sY2xWbGJtRjBhVzl1T2kxaloyOTJhV0ZzYVd4cGRIa2dUVkZPVTFvS1lURXoiLCJlbWFpbCI6ImV4YW1wbGUuY29tIn19fQ==
+type: kubernetes.io/dockerconfigjson
