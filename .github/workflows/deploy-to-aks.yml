@@ -1,4 +1,4 @@
-name: Deploy to AKS using Helm
+\name: Deploy to AKS using Helm
 
 on:
   push:
@@ -17,23 +17,29 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      # New Step: Test Cluster Connection
-      - name: Verify kubectl connection
-        run: kubectl get nodes
-
-      # New Step: List Existing Releases
-      - name: List Helm releases
-        run: helm list 
 
       - name: Set up Helm
         uses: azure/setup-helm@v1
 
+      - name: Install Kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'  # Or specify a version if needed
+          
+
       - name: Get AKS credentials
         run: az aks get-credentials --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} --name ${{ secrets.AKS_CLUSTER_NAME }}
+
+      - name: Verify kubectl connection
+        run: kubectl get nodes
+
+      - name: List Helm releases
+        run: helm list 
 
       - name: Install or Upgrade Helm Release
         working-directory: helm
         run: |
           helm upgrade --install sample-api ./sample-api 
+
 
 
