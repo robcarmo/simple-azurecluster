@@ -1,4 +1,4 @@
-\name: Deploy to AKS using Helm
+name: Deploy to AKS using Helm
 
 on:
   push:
