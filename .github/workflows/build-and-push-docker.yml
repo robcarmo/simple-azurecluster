@@ -28,4 +28,4 @@ jobs:
       - name: Build and push Docker image
         working-directory: docker/api
         run: |
-          docker buildx build --push --tag ${{ secrets.ACR_NAME }}.azurecr.io/myapp:latest .
+          docker buildx build --push --tag ${{ secrets.ACR_NAME }}.azurecr.io/sample-api:latest .
