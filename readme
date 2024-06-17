@@ -1,12 +1,12 @@
 Based on the provided PDF, we can divide the deliverables into phases to manage the workflow efficiently. Here's a suggested breakdown:
 
-### Phase 1: Planning and Setup**
+Phase 1: Planning and Setup
 Define User Story and Epic
 
 Create an informal user story to drive the deployment.
 Define the epic and list out the tasks necessary for the deployment.
 
-### Initial Repository Setup
+Initial Repository Setup
 
 Set up a Git repository with a structured approach for multiple environments.
 Prepare the initial documentation outlining the project scope and plan.
