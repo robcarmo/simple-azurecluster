@@ -1,4 +1,12 @@
-
+provider "azurerm" {
+  features {}
+  version = ">= 3.0.0"
+  client_id     = "ba07f6d1-900b-4999-815b-f254eeb62a12"
+  client_secret = "9bJ8Q~dn5qqPNqWwqwxw7fGliFlBUgTjA0A2VcrO"
+  tenant_id     = "7cb0244d-1f9d-408c-b688-be905dab183d"
+  subscription_id = "bc8787fc-2fc4-4fef-beee-ca04fdd4e384"
+  #skip_provider_registration = true
+}
 
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
@@ -11,6 +19,7 @@ module "log_analytics" {
   location            = var.location
   resource_group_name = var.resource_group_name
   aks_id              = module.aks.aks_id
+  depends_on = [azurerm_resource_group.main]
 }
 
 module "app_insights" {
@@ -18,6 +27,7 @@ module "app_insights" {
   name                = "my-app-insights-${var.environment}"
   location            = var.location
   resource_group_name = var.resource_group_name
+  depends_on = [azurerm_resource_group.main]
 }
 
 module "acr" {
