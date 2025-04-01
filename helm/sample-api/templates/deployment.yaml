@@ -30,7 +30,5 @@ spec:
               key: password
         resources:
 {{ toYaml .Values.resources | indent 10 }}
-      imagePullSecrets:
-      - name: acr-secret
 
 

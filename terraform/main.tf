@@ -82,6 +82,20 @@ module "storage" {
   depends_on = [azurerm_resource_group.main]
 }
 
+resource "azurerm_ad_application" "acr_app" {
+  display_name = "acr-app"
+}
+
+resource "azurerm_ad_service_principal" "acr_sp" {
+  application_id = azurerm_ad_application.acr_app.application_id
+}
+
+resource "azurerm_role_assignment" "aks_acr_pull" {
+  scope                = module.acr.acr_id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_ad_service_principal.acr_sp.id
+}
+
 resource "random_string" "suffix" {
   length  = 6
   special = false
