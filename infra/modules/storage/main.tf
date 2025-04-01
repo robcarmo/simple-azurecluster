@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "example" {
-  name     = "cc-azure-rg"
+  name     = "cc-rg"
   location = "East US"
 }
 
