@@ -1,45 +1,35 @@
-name: Build and Deploy to Azure
+name: Build App Container
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'app/**'
+      - 'app/Dockerfile'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'  # Specify your Node.js version
-
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./app  # Specify the app directory
-
-      - name: Build the app
-        run: npm run build
-        working-directory: ./app  # Specify the app directory
+        uses: actions/checkout@v3
 
       - name: Login to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZ_CRED }}  # Service principal credentials
 
-      # Uncomment the following steps to push the image to ACR
-      # - name: Build Docker image
+      - name: Build Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./app
+          push: false  # Set to false since we are not pushing to ACR
+          tags: |
+            hello-world:${{ github.sha }}  # Local tag for the built image
+
+      # Uncomment the following steps to push the image to ACR when ready
+      # - name: Push Docker Image to ACR
       #   run: |
-      #     docker build -t youracrname.azurecr.io/your-app-name:latest .
-      #
-      # - name: Log in to ACR
-      #   run: |
-      #     echo ${{ secrets.AZ_CRED }} | docker login youracrname.azurecr.io --username your-client-id --password-stdin
-      #
-      # - name: Push Docker image to ACR
-      #   run: |
-      #     docker push youracrname.azurecr.io/your-app-name:latest
+      #     docker push youracrname.azurecr.io/hello-world:${{ github.sha }}
+      #     docker push youracrname.azurecr.io/hello-world:latest
