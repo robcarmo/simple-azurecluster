@@ -13,3 +13,9 @@ variable "module_enabled" {
   type        = bool
   default     = false # Disabled by default
 }
+
+variable "app_insights_name" {
+  description = "The name for the Application Insights instance."
+  type        = string
+  default     = "appi-default"
+}
