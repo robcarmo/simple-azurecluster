@@ -9,7 +9,7 @@ variable "location" {
   type        = string
   default     = "East US" # Or any preferred region
 }
-#
+
 # This file (terraform/variables.tf) can be expanded or used if variables
 # are moved out of main.tf for better organization.
 
