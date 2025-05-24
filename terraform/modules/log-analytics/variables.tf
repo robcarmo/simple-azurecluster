@@ -13,3 +13,9 @@ variable "module_enabled" {
   type        = bool
   default     = false # Disabled by default
 }
+
+variable "log_analytics_workspace_name" {
+  description = "The name for the Log Analytics workspace."
+  type        = string
+  default     = "logws-default"
+}
