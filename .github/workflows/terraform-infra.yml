@@ -60,4 +60,3 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only apply on direct push to main
         run: terraform apply -auto-approve -input=false tfplan
         working-directory: ${{ env.TF_WORKING_DIR }}
-```
