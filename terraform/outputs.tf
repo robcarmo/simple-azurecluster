@@ -15,5 +15,5 @@ output "acr_login_server" {
 
 output "postgresql_server_fqdn" {
   description = "The FQDN of the PostgreSQL server."
-  value       = module.database.postgresql_server_fqdn_output # Assuming the module has an output named 'postgresql_server_fqdn_output'
+  value       = module.database.postgresql_server_fqdn 
 }
