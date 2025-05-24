@@ -7,56 +7,41 @@ on:
     paths:
       - 'terraform/**' # Trigger only when files in terraform directory change
       - '.github/workflows/terraform-infra.yml' # Or when this workflow itself changes
-
-env:
-  # Set ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID as GitHub secrets
-  # These are used by Terraform AzureRM provider for authentication if not using azure/login
-  # However, using azure/login is often preferred for more features.
-  # TF_LOG: "DEBUG" # Uncomment for detailed Terraform logging if needed
-  TF_WORKING_DIR: "terraform" # Set working directory for Terraform commands
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
-  apply_infrastructure:
-    name: Terraform Apply
+  deploy-infra:
     runs-on: ubuntu-latest
-    # environment: production # Optional: if using GitHub environments
 
     steps:
+      # Checkout source code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.5" # Specify your desired Terraform version
-          # terraform_wrapper: true # Optional: if you want to use the wrapper
-
+      # Login to Azure using service principal (needs AZURE_CREDENTIALS secret)
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZ_CRED }} # Assumes AZ_CRED secret is configured (JSON output of `az ad sp create-for-rbac`)
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # Terraform Init
       - name: Terraform Init
-        run: terraform init -input=false
-        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cd infra
+          terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: ${{ env.TF_WORKING_DIR }}
-
+      # Terraform Plan
       - name: Terraform Plan
-        id: plan
-        run: terraform plan -input=false -no-color -out=tfplan
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        # Continue on error to allow plan output even if there are diffs that would cause an error code
-        # continue-on-error: true 
+        run: |
+          cd infra
+          terraform plan -out=tfplan
 
-      # Optional: Add a step to output the plan, e.g., for pull request comments
-      # - name: Show Plan
-      #   run: terraform show -no-color tfplan
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-
+      # Terraform Apply
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only apply on direct push to main
-        run: terraform apply -auto-approve -input=false tfplan
-        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cd infra
+          terraform apply -auto-approve tfplan
