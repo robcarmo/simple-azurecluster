@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Login to Azure using service principal (needs AZURE_CREDENTIALS secret)
+      ## Login to Azure using service principal (needs AZURE_CREDENTIALS secret)
       - name: Azure Login
         uses: azure/login@v1
         with:
