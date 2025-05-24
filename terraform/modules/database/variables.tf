@@ -28,9 +28,9 @@ variable "postgresql_admin_password" {
 }
 
 variable "postgresql_sku_name" {
-  description = "The SKU name for the PostgreSQL server. Examples: B_Gen5_1, GP_Gen5_2."
+  description = "The SKU name for the PostgreSQL Flexible Server. Examples: B_Standard_B1ms, GP_Standard_D2s_v3."
   type        = string
-  default     = "B_Gen5_1" # Basic tier, 1 vCore
+  default     = "B_Standard_B1ms" # Burstable, 1 vCore, 2 GiB RAM
 }
 
 variable "postgresql_version" {
@@ -40,9 +40,9 @@ variable "postgresql_version" {
 }
 
 variable "postgresql_storage_mb" {
-  description = "The maximum storage capacity in MB for the PostgreSQL server."
+  description = "The maximum storage capacity in MB for the PostgreSQL server. Minimum 32768 (32 GB)."
   type        = number
-  default     = 5120 # 5GB
+  default     = 32768 # 32GB
 }
 
 variable "backup_retention_days" {
