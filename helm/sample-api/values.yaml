@@ -1,0 +1,75 @@
+replicaCount: 1
+
+image:
+  repository: myacrname.azurecr.io/sample-node-api # Replace with your ACR name and image path
+  pullPolicy: IfNotPresent
+  tag: "latest" # Or a specific version/tag
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+service:
+  type: LoadBalancer # Or ClusterIP if using an Ingress controller
+  port: 80
+  targetPort: 8080 # The port the Node.js app listens on (from app/app.js)
+
+# Ingress configuration (optional)
+# ingress:
+#   enabled: false
+#   className: ""
+#   annotations: {}
+#     # kubernetes.io/ingress.class: nginx
+#     # kubernetes.io/tls-acme: "true"
+#   hosts:
+#     - host: chart-example.local
+#       paths:
+#         - path: /
+#           pathType: ImplementationSpecific
+#   tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Resources limits and requests
+# resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Liveness and Readiness Probes
+# livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+# readinessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+
+# PostgreSQL connection details
+# These values will be used to construct environment variables for the API pods.
+# The postgresql.host should typically be the service name of your PostgreSQL chart deployment.
+# Example: postgresql-postgresql (if release name for postgresql chart is 'postgresql')
+postgresql:
+  enabled: true # Whether to configure PostgreSQL connection for the API
+  host: "postgresql-postgresql" # IMPORTANT: This needs to match the service name of your PostgreSQL deployment.
+                                # Helm typically names services {{ .Release.Name }}-{{ .Chart.Name }}
+                                # So if PostgreSQL chart is released as 'db', service might be 'db-postgresql'.
+  port: 5432
+  username: "user"        # Should match the user in your PostgreSQL chart/instance
+  password: "password"    # IMPORTANT: Should match the password. Consider using secrets.
+  database: "mydatabase"  # Should match the database name
+
+# Environment variables to be passed to the application
+# You can add other environment variables here as well
+env:
+  NODE_ENV: "production"
+  # Other app-specific env vars
