@@ -13,3 +13,9 @@ variable "module_enabled" {
   type        = bool
   default     = false # Disabled by default
 }
+
+variable "vnet_name" {
+  description = "The name for the virtual network."
+  type        = string
+  default     = "vnet-default"
+}
