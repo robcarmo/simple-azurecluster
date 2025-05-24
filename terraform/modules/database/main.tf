@@ -11,11 +11,10 @@ resource "azurerm_postgresql_flexible_server" "main" {
   backup_retention_days      = var.backup_retention_days
   geo_redundant_backup_enabled = var.geo_redundant_backup_enabled
 
-  # For simplicity, allow public access from any Azure service and disable SSL enforcement.
-  # In a production environment, configure VNet integration or private endpoints,
-  # and enforce SSL.
+  # For simplicity, allow public access from any Azure service.
+  # In a production environment, configure VNet integration or private endpoints.
+  # SSL is typically enforced by default on Flexible Servers.
   public_network_access_enabled = true # Set to false for private access
-  ssl_enforcement_enabled       = false # Set to true in production
 
   # Flexible server requires zone to be set, or high_availability to be configured
   zone = "1" # Or other availability zone like "2", "3". Pick one available in your region.
