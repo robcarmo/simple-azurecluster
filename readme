@@ -26,7 +26,7 @@ Implement automated backups and disaster recovery procedures.
 Phase 3: Containerization and Orchestration
 Dockerfiles Creation
 
-Create Dockerfiles for the sample API and database.
+Create Dockerfiles for the sample Node.js API and database.
 Ensure Dockerfiles follow best practices for security and efficiency.
 Helm Charts Development
 
@@ -69,30 +69,30 @@ Share the GitHub repository with the technical interview panel at the requested 
 
 
 User Story
-As a DevOps Engineer, I want to deploy a sample API with multiple replicas and its associated database using Azure Kubernetes Service (AKS), ensuring best practices in deployment, security, and performance, so that the application is accessible to users while the database remains secure and optimized.
+As a DevOps Engineer, I want to deploy a sample Node.js API with multiple replicas and its associated PostgreSQL database using Azure Kubernetes Service (AKS), ensuring best practices in deployment, security, and performance, so that the application is accessible to users while the database remains secure and optimized.
 
 Epic
-Epic: Deploy Sample API and Database on AKS
+Epic: Deploy Sample Node.js API and Database on AKS
 Tasks:
 Define Infrastructure with Terraform
 
 Create Terraform code to provision the necessary resources for AKS.
-Structure the repository to support multiple environments (development, staging, production).
+Structure the repository to support multiple environments (development, staging, production). (Note: Current setup focuses on a single environment, with multi-environment as a future possibility).
 Implement best practices for Terraform code organization and reuse.
 Configure and Optimize the Database
 
-Set up the database within AKS with persistent storage.
+Set up the PostgreSQL database within AKS with persistent storage.
 Configure the database for optimal performance.
 Implement monitoring for database health and performance.
 Set up automated backup and disaster recovery procedures.
 Create Docker Images
 
-Develop Dockerfiles for the sample API and the database.
+Develop a Dockerfile for the sample Node.js API (located in `app/Dockerfile`).
 Ensure Docker images follow best practices for security and efficiency.
 Push the Docker images to a container registry.
 Manage Kubernetes Resources with Helm
 
-Develop Helm charts to define, install, and manage the Kubernetes resources.
+Develop Helm charts to define, install, and manage the Kubernetes resources for the Node.js API and PostgreSQL.
 Optionally use Kustomize for advanced configuration if needed.
 Deploy the API and database to AKS using Helm charts.
 Ensure Secure and Accessible Deployment
@@ -118,7 +118,7 @@ Organize the codebase for a thorough code review.
 Prepare to answer questions regarding coding decisions and technical implementations.
 Documentation
 
-Document all steps, configurations, and decisions in the README file.
+Document all steps, configurations, and decisions in this README file.
 Include the user story and epic as part of the documentation.
 Ensure clear and concise documentation for future reference and review.
 
@@ -129,14 +129,11 @@ Task 2- Directory Structure
 ├── workflows/
 │   ├── build-and-push-docker.yml
 │   └── deploy-to-aks.yml
+app/
+├── Dockerfile
+├── app.js
+└── package.json
 k8config/
-docker/
-├── api/
-│   ├── Dockerfile
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py
-│   │   └── requirements.txt
 helm/
 ├── sample-api/
 │   ├── Chart.yaml
@@ -144,7 +141,6 @@ helm/
 │   ├── templates/
 │       ├── deployment.yaml
 │       ├── service.yaml
-│       ├── netowrkpolicy.yaml
 ├── postgresql/
 │   ├── Chart.yaml
 │   ├── values.yaml
@@ -188,60 +184,64 @@ terraform/
 
 Directory Structure Explanation
 .github/
-workflows/: Contains GitHub Actions workflows for CI/CD.
+workflows/: Contains GitHub Actions workflows for CI/CD. (`build-and-push-docker.yml` and `deploy-to-aks.yml`)
 
-docker/
-api/: Contains the Docker-related files for the API service.
+app/: Contains the Node.js application code (`app.js`, `package.json`) and its `Dockerfile`.
 
 helm/
-sample-api/: Helm chart for deploying the sample API.
+sample-api/: Helm chart for deploying the sample Node.js API.
 postgresql/: Helm chart for deploying PostgreSQL.
 
 k8config/ : Contains extra configs for app and k8s.
 
-Terraform Modules Directory Structure
-acr/: Configures Azure Container Registry.
-aks/: Configures Azure Kubernetes Service.
-app-insights/: Configures Azure Application Insights.
-database/: Configures PostgreSQL database.
-storage/: Configures Azure Storage.
-networking/: Configures networking resources (VNet, Subnets, NSGs).
-log-analytics/: Configures Azure Log Analytics workspace.
+Terraform Configuration (`terraform/`)
+The root directory `terraform/` contains the main configuration (`main.tf`, `variables.tf`, `outputs.tf`) responsible for orchestrating the deployment of various infrastructure modules.
 
-Each module directory contains the necessary Terraform files to configure a specific resource or set of resources, making the infrastructure code modular and reusable.
+Terraform Modules (`terraform/modules/`)
+The `modules/` subdirectory houses individual modules for different Azure services:
+
+acr/: Configures Azure Container Registry (ACR). (Actively used)
+aks/: Configures Azure Kubernetes Service (AKS). (Actively used)
+database/: Configures Azure Database for PostgreSQL. (Actively used)
+storage/: Configures Azure Storage. (Contains basic configuration, enabled by default)
+app-insights/: Placeholder for Azure Application Insights. (Disabled by default via `module_enabled` variable)
+networking/: Placeholder for networking resources (VNet, Subnets, NSGs). (Disabled by default via `module_enabled` variable)
+log-analytics/: Placeholder for Azure Log Analytics workspace. (Disabled by default via `module_enabled` variable)
+
+Each module is designed to be reusable and is called from the root `main.tf`. Modules can be enabled or disabled using the `module_enabled` variable within their respective `variables.tf` files (or overridden from the root). This allows for a flexible infrastructure setup where components can be included or excluded as needed.
 
 CI/CD Pipeline Explanation
 
-1. Build and Push Docker Image
+1. Build and Push Docker Image (`build-and-push-docker.yml`)
 This workflow is triggered by pushes to the main branch. It performs the following steps:
 
 Checkout Code: Retrieves the latest code from the repository.
 Set Up Docker: Configures Docker Buildx for building multi-platform images.
 Login to Azure: Authenticates with Azure using the credentials set up in the GitHub repository secrets.
 Login to ACR: Authenticates with Azure Container Registry.
-Build and Push Docker Image: Builds the Docker image for the sample API and pushes it to ACR.
+Build and Push Docker Image: Builds the Docker image for the sample Node.js API (from `app/Dockerfile`) and pushes it to ACR.
 
-2. Deploy to AKS
+2. Deploy to AKS (`deploy-to-aks.yml`)
 This workflow is triggered by pushes to the main branch. It performs the following steps:
 
 Checkout Code: Retrieves the latest code from the repository.
 Login to Azure: Authenticates with Azure using the credentials set up in the GitHub repository secrets.
 Set Up kubectl: Configures kubectl to interact with the AKS cluster.
 Get AKS Credentials: Retrieves the AKS cluster credentials to configure kubectl.
-Deploy to AKS: Uses Helm to deploy the sample API to the AKS cluster, referencing the Docker images stored in ACR.
+Deploy to AKS: Uses Helm to deploy the sample Node.js API and PostgreSQL to the AKS cluster, referencing the Docker images stored in ACR.
 Deployment Process
 Build and Push Docker Image:
 
-The CI workflow builds the Docker image from the Dockerfile in the docker/api/ directory.
+The CI workflow builds the Docker image from the Dockerfile in the `app/` directory.
 The built image is tagged and pushed to Azure Container Registry.
 Deploy to AKS:
 
 The CD workflow retrieves the latest image from ACR.
-Helm is used to deploy the application to the AKS cluster, applying configurations specified in the Helm chart located in helm/sample-api/.
+Helm is used to deploy the application (and PostgreSQL) to the AKS cluster, applying configurations specified in the Helm charts located in `helm/sample-api/` and `helm/postgresql/`.
 
 Summary
 
-The CI/CD pipeline leverages GitHub Actions to automate the build, push, and deployment processes. Docker images are built and pushed to ACR, and the application is deployed to AKS using Helm charts. This setup ensures a streamlined and automated workflow for deploying updates to the sample API, with all necessary configurations and secrets managed securely within GitHub and Azure.
+The CI/CD pipeline leverages GitHub Actions to automate the build, push, and deployment processes. Docker images are built and pushed to ACR, and the application is deployed to AKS using Helm charts. This setup ensures a streamlined and automated workflow for deploying updates to the sample Node.js API, with all necessary configurations and secrets managed securely within GitHub and Azure.
 
 
 Deployment and CI/CD Explanation
@@ -250,48 +250,47 @@ Step 1: Infrastructure Setup with Terraform
 
 Initialize Terraform to set up the working directory for configuration files.
 Plan the infrastructure deployment, allowing review of the execution plan.
-Apply the Terraform configuration to create the necessary infrastructure, including the AKS cluster, ACR, and other components.
+Apply the Terraform configuration to create the necessary infrastructure, including the AKS cluster, ACR, Azure Database for PostgreSQL, and other components.
 Step 2: Build and Push Docker Image to ACR
 
-Build the Docker image for the sample API from the Dockerfile in the specified directory.
+Build the Docker image for the sample Node.js API from the Dockerfile in the `app/` directory.
 Login to Azure Container Registry to authenticate Docker with ACR.
 Push the built Docker image to ACR for storage and later deployment.
 Step 3: Deploy Application to AKS with Helm
 
 Package the Helm chart to prepare it for deployment.
-Install the Helm chart to deploy the sample API to the AKS cluster.
-Upgrade the deployment using Helm if there are updates to the application.
+Install or upgrade the Helm charts to deploy the sample Node.js API and PostgreSQL to the AKS cluster.
 Verify the deployment to ensure everything is running correctly.
 CI/CD Pipeline Explanation
-Build and Push Docker Image
+Build and Push Docker Image (`build-and-push-docker.yml`)
 
-This workflow builds a Docker image for the sample API and pushes it to ACR. It is triggered by pushes to the main branch and performs the following steps:
+This workflow builds a Docker image for the sample Node.js API and pushes it to ACR. It is triggered by pushes to the main branch and performs the following steps:
 Checkout the latest code from the repository.
 Set up Docker Buildx for multi-platform image builds.
 Authenticate with Azure and ACR.
 Build and push the Docker image to ACR.
-Deploy to AKS
+Deploy to AKS (`deploy-to-aks.yml`)
 
-This workflow deploys the Docker image to AKS using Helm. It is triggered by pushes to the main branch and performs the following steps:
+This workflow deploys the Docker image (and PostgreSQL) to AKS using Helm. It is triggered by pushes to the main branch and performs the following steps:
 Checkout the latest code from the repository.
 Authenticate with Azure.
 Configure kubectl to interact with the AKS cluster.
 Retrieve AKS cluster credentials to configure kubectl.
-Deploy the sample API to the AKS cluster using Helm.
+Deploy the sample Node.js API and PostgreSQL to the AKS cluster using Helm.
 Testing Steps
 1. Access the Application
 
-Retrieve the service details to get the external IP address.
+Retrieve the service details to get the external IP address for the Node.js API.
 Open a web browser and navigate to the external IP address to access the application.
 2. Verify Pod Status
 
-Check the status of the pods to ensure they are running correctly.
+Check the status of the pods (for both the API and PostgreSQL) to ensure they are running correctly.
 If any pods are not running correctly, check the logs for troubleshooting.
 3. Run Automated Tests
 
-Define and run tests locally to verify application functionality.
+Define and run tests locally to verify application functionality, including database interaction.
 Integrate tests into the CI/CD pipeline to automate testing after deployment.
 Summary
-This deployment process ensures that your sample API is built, pushed, and deployed in a streamlined manner using Terraform, Docker, and Helm. The CI/CD pipeline automates the build and deployment steps, leveraging GitHub Actions for continuous integration and deployment. Testing steps include verifying the application via the public IP, ensuring all pods are running correctly, and integrating automated tests into your CI/CD pipeline. This setup allows for efficient and scalable application deployment to Azure Kubernetes Service.
+This deployment process ensures that your sample Node.js API (with PostgreSQL) is built, pushed, and deployed in a streamlined manner using Terraform, Docker, and Helm. The CI/CD pipeline automates the build and deployment steps, leveraging GitHub Actions for continuous integration and deployment. Testing steps include verifying the application via the public IP, ensuring all pods are running correctly, and integrating automated tests into your CI/CD pipeline. This setup allows for efficient and scalable application deployment to Azure Kubernetes Service.
 
 Note: All secrets required for GitHub and Kubernetes manifests are not included in this documentation due to time restrictions, but they should be considered a critical part of this work.

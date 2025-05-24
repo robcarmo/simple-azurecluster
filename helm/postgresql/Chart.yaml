@@ -1,0 +1,11 @@
+apiVersion: v2
+name: postgresql
+description: A Helm chart for deploying PostgreSQL
+type: application
+version: 0.1.0 # Initial version
+appVersion: "13" # Specify PostgreSQL version if chart is tied to it, or remove
+# Optional: Add maintainers, sources, icon, etc.
+keywords:
+  - postgresql
+  - database
+  - sql
