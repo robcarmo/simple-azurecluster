@@ -245,7 +245,8 @@ The GitHub Actions workflow defined in `.github/workflows/terraform-infra.yml` a
 
 CI/CD Pipeline Explanation
 
-The CI/CD pipelines are managed using GitHub Actions. The workflows are defined in the `.github/workflows/` directory.
+The CI/CD pipelines are managed using GitHub Actions. The primary workflows for infrastructure management (Terraform), application container building, and deployment to AKS have been configured for manual triggering. This provides direct control over when changes are provisioned or deployed to your Azure environment. You can trigger these workflows from the "Actions" tab of this repository.
+The workflows are defined in the `.github/workflows/` directory.
 
 1.  **Terraform Infrastructure Workflow (`terraform-infra.yml`)**
     *   **Purpose:** Automates the provisioning and management of the Azure infrastructure using Terraform.
@@ -275,16 +276,34 @@ To manually run this workflow:
 
 **Caution:** The `destroy` action will permanently delete your Azure infrastructure managed by this workflow. Use this option with extreme care and ensure you understand its consequences, especially in a production environment.
 
-2.  **Build and Push Docker Image (`build-and-push-docker.yml`) - Temporarily Disabled**
-    *   **Original Purpose:** Builds the Docker image for the sample Node.js API and pushes it to Azure Container Registry (ACR).
-    *   **Current Status:** This workflow is temporarily disabled by having its job steps commented out. The trigger is on pushes to `main` for changes in `app/**` or `app/Dockerfile`.
+2.  **Build and Push Docker Image (`Build App Container` workflow)**
+    *   **Purpose:** Builds the Docker image for the sample Node.js application (from `app/Dockerfile`) and pushes it to Azure Container Registry (ACR). The image will be tagged with the provided input tag and `latest`, and will be available at `${{ secrets.ACR_NAME }}.azurecr.io/hello-world`.
+    *   **Trigger:** Manually triggered via `workflow_dispatch` from the "Actions" tab of the GitHub repository.
+        *   Select the "**Build App Container**" workflow.
+        *   Provide the required `image_tag` input (e.g., `v1.0.0`, `my-feature-branch`, or `latest`).
+    *   **Status:** Active. This workflow will perform real build and push operations to your ACR.
+    *   **Required Secrets:**
+        *   `AZ_CRED`: Azure service principal credentials for logging into Azure.
+        *   `ACR_NAME`: The name of your Azure Container Registry.
 
-3.  **Deploy to AKS (`deploy-to-aks.yml`) - Temporarily Disabled**
-    *   **Original Purpose:** Deploys the sample Node.js API and PostgreSQL to the Azure Kubernetes Service (AKS) cluster using Helm charts.
-    *   **Current Status:** This workflow is temporarily disabled by having its job steps commented out. The trigger is on pushes to `main` for changes in `helm/**` or the workflow file itself.
+3.  **Deploy to AKS (`Deploy to AKS` workflow)**
+    *   **Purpose:** Deploys or upgrades the PostgreSQL Helm chart (release name: `postgresql-release`) and the sample Node.js API Helm chart (release name: `sample-api-release`) to the configured Azure Kubernetes Service (AKS) cluster.
+    *   **Trigger:** Manually triggered via `workflow_dispatch` from the "Actions" tab of the GitHub repository.
+        *   Select the "**Deploy to AKS**" workflow.
+        *   Provide the required `image_tag` input. This tag should correspond to an existing image tag in your ACR for the `sample-node-api` (e.g., `${{ secrets.ACR_NAME }}.azurecr.io/sample-node-api:<image_tag>`).
+    *   **Status:** Active. This workflow will perform real deployment operations to your AKS cluster.
+    *   **Helm Configuration Notes:**
+        *   PostgreSQL is deployed as `postgresql-release`. The sample API Helm chart expects the PostgreSQL service to be available at `postgresql-release-postgresql.default.svc.cluster.local`.
+        *   The sample API is deployed as `sample-api-release`.
+    *   **Required Secrets:**
+        *   `AZ_CRED`: Azure service principal credentials.
+        *   `AZ_RESOURCE_GROUP`: The name of the Azure resource group containing your AKS cluster.
+        *   `AZ_AKS_CLUSTER_NAME`: The name of your AKS cluster.
+        *   `DB_PASSWORD`: Password for the PostgreSQL database, used by both Helm charts.
+        *   `ACR_NAME`: The name of your Azure Container Registry, used to pull the `sample-node-api` image.
 
 **Note on Workflow Activation:**
-The application build and deployment workflows (`build-and-push-docker.yml` and `deploy-to-aks.yml`) can be re-enabled by uncommenting their job steps once the infrastructure is successfully provisioned and ACR/AKS details are available and configured (potentially as secrets or outputs from the Terraform workflow).
+The `terraform-infra.yml` workflow description above still reflects its original push trigger. It has also been updated to manual trigger as described in its dedicated "Manually Triggering the Terraform Workflow" section. The application build and deployment workflows (`Build App Container` and `Deploy to AKS`) are now active and manually triggered as described above.
 Deployment Process
 Build and Push Docker Image:
 
