@@ -18,7 +18,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   identity {
     type = "SystemAssigned"
   }
-      
+    
   tags = {
     environment = "sample_app_env"
     project     = "Sample Nodejs App"
