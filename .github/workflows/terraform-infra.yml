@@ -18,6 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+working-directory: terraform
       # Login to Azure using service principal (needs AZURE_CREDENTIALS secret)
       - name: Azure Login
         uses: azure/login@v1
@@ -36,12 +37,18 @@ jobs:
 
       # Terraform Plan
       - name: Terraform Plan
-        run: |
-          cd infra
-          terraform plan -out=tfplan
+        id: plan # Added id for potential future use (e.g. outputting plan)
+        run: terraform plan -input=false -no-color -out=tfplan
+        working-directory: terraform
+
+      # Optional: Add a step to output the plan, e.g., for pull request comments
+      # - name: Show Plan
+      #   run: terraform show -no-color tfplan
+      #   working-directory: terraform
+
 
       # Terraform Apply
       - name: Terraform Apply
-        run: |
-          cd infra
-          terraform apply -auto-approve tfplan
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only apply on direct push to main
+        run: terraform apply -auto-approve -input=false tfplan
+        working-directory: terraform
