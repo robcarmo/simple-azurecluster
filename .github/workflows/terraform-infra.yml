@@ -12,43 +12,60 @@ on:
 jobs:
   deploy-infra:
     runs-on: ubuntu-latest
+    # Set default working directory for all steps in this job
+    defaults:
+      run:
+        working-directory: ./terraform # Assuming your TF files are in a 'terraform' subdirectory
 
     steps:
       # Checkout source code
       - name: Checkout code
         uses: actions/checkout@v3
 
-working-directory: terraform
       # Login to Azure using service principal (needs AZURE_CREDENTIALS secret)
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }} # Ensure this secret contains the correctly formatted JSON
 
       # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
+        # No 'with' block needed if you're okay with default Terraform version
+        # or if you've set TF_VERSION env var. Add 'terraform_version: "x.y.z"' if needed.
 
       # Terraform Init
       - name: Terraform Init
+        run: terraform init
+        # No need for 'cd infra' if 'working-directory' is set at the job level
+        # or step level correctly. Assuming TF files are directly in 'terraform' folder.
+      - name: Attempt to Import Resource Group (Use with Caution)
+        # This step is risky and generally not recommended for regular CI/CD
+        # It's better to import manually once.
+        # This tries to import and continues if it fails (e.g., already imported or doesn't exist to import)
         run: |
-          cd infra
-          terraform init
+          terraform import azurerm_resource_group.main /subscriptions/0e1938d0-bd3f-4a45-9b14-8ac9a026e2d7/resourceGroups/cc-rg-new || echo "Import failed or resource already managed/not found, continuing..."
+        working-directory: ./terraform # Explicit working directory for this specific import step
+        continue-on-error: true # This is important if you expect failures
 
       # Terraform Plan
       - name: Terraform Plan
-        id: plan # Added id for potential future use (e.g. outputting plan)
+        id: plan # Good for referencing plan outputs if needed later
         run: terraform plan -input=false -no-color -out=tfplan
-        working-directory: terraform
+        # working-directory: terraform # This is redundant if job default is set
 
-      # Optional: Add a step to output the plan, e.g., for pull request comments
-      # - name: Show Plan
-      #   run: terraform show -no-color tfplan
-      #   working-directory: terraform
-
+      # Optional: Add a step to output the plan for review (especially in PRs)
+      # This step is useful for debugging or manual review before apply
+      - name: Show Plan
+        if: always() # Show plan even if previous steps fail, for debugging. Or remove if: for specific conditions.
+        run: terraform show -no-color tfplan
+        # working-directory: terraform # Redundant if job default is set
 
       # Terraform Apply
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only apply on direct push to main
+        # Ensure this condition is exactly what you want.
+        # Currently applies only on a direct push to the 'main' branch.
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve -input=false tfplan
-        working-directory: terraform
+        # working-directory: terraform # Redundant if job default is set
+```
