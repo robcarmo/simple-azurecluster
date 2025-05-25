@@ -1,6 +1,6 @@
 output "resource_group_name" {
-  description = "The name of the selected resource group." # Updated description
-  value       = data.azurerm_resource_group.selected.name
+  description = "The name of the selected resource group." 
+  value       = data.azurerm_resource_group.existing_rg.name # Updated data source local name
 }
 
 output "aks_cluster_name" {
@@ -17,3 +17,4 @@ output "postgresql_server_fqdn" {
   description = "The FQDN of the PostgreSQL server."
   value       = module.database.postgresql_server_fqdn 
 }
+```

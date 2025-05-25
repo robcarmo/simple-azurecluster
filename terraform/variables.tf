@@ -1,9 +1,3 @@
-variable "existing_resource_group_name" {
-  description = "The name of the existing resource group to use."
-  type        = string
-  default     = "cc-rg-new"
-}
-
 variable "acr_name" {
   description = "The globally unique name for the Azure Container Registry."
   type        = string
