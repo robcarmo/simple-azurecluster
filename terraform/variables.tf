@@ -1,7 +1,7 @@
 variable "resource_group_name" {
   description = "The name of the resource group where resources will be created."
   type        = string
-  default     = "rg-sample-app-infra"
+  default     = "cc-rg-new"
 }
 
 variable "location" {
