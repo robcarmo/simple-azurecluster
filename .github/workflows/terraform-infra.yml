@@ -10,32 +10,32 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 jobs:
-  deploy-infra: # Renamed from apply_infrastructure for consistency with user's version
-    name: Terraform Deploy Infrastructure # More descriptive job name
+  deploy-infra:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout source code
       - name: Checkout code
         uses: actions/checkout@v3
 
+working-directory: terraform
+      # Login to Azure using service principal (needs AZURE_CREDENTIALS secret)
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZ_CRED }} # Standardized to AZ_CRED; user should ensure this secret exists
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.5" # Specify Terraform version
 
+      # Terraform Init
       - name: Terraform Init
-        run: terraform init -input=false
-        working-directory: terraform
+        run: |
+          cd infra
+          terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: terraform
-
+      # Terraform Plan
       - name: Terraform Plan
         id: plan # Added id for potential future use (e.g. outputting plan)
         run: terraform plan -input=false -no-color -out=tfplan
@@ -46,8 +46,9 @@ jobs:
       #   run: terraform show -no-color tfplan
       #   working-directory: terraform
 
+
+      # Terraform Apply
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' # Only apply on direct push to main
         run: terraform apply -auto-approve -input=false tfplan
         working-directory: terraform
-```
