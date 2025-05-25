@@ -1,8 +1,8 @@
-# variable "resource_group_name" {
-#   description = "The name of the resource group where resources will be created."
-#   type        = string
-#   default     = "cc-rg-new"
-# }
+  variable "resource_group_name" {
+  description = "The name of the resource group where resources will be created."
+  type        = string
+  default     = "cc-rg-new"
+}
 
 variable "location" {
   description = "The Azure region where resources will be created."
