@@ -1,0 +1,50 @@
+# Default values for postgresql chart.
+replicaCount: 1
+
+image:
+  repository: postgres # Using official Docker Hub image
+  pullPolicy: IfNotPresent
+  tag: "13-alpine" # Specify a version, alpine for smaller size
+
+# Service account to be used.
+# serviceAccount:
+#   create: true
+#   name: ""
+
+# Name override for resources
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 5432
+
+postgresql:
+  username: "user"
+  password: "password" # IMPORTANT: Override this in values or via --set
+  database: "mydatabase"
+  # Example: postgresqlHost: "postgresql-service" (if different from release name)
+
+persistence:
+  enabled: true
+  storageClass: "" # Or specify a StorageClass, e.g., "standard", "managed-premium"
+  size: 8Gi
+  # existingClaim: "" # Optionally use an existing PVC
+
+# Resources limits and requests
+# resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Node selector, tolerations, affinity
+# nodeSelector: {}
+# tolerations: []
+# affinity: {}
