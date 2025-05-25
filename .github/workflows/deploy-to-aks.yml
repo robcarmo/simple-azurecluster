@@ -1,65 +1,68 @@
 name: Deploy to AKS
 
 on:
-  push:
-    branches:
-      - main # Or your deployment branch
-    paths: # Trigger only if relevant Helm charts or this workflow changes
-      - 'helm/**'
-      - '.github/workflows/deploy-to-aks.yml'
-      # Potentially trigger if the image build workflow runs successfully (workflow_run)
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Image tag of the sample-node-api to deploy'
+        required: true
+        default: 'latest'
+        type: string
 
-#jobs:
-#  deploy:
-#    runs-on: ubuntu-latest
-#    # Add environment if you use GitHub environments for protection rules/secrets
-#    # environment: production 
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v3
-#
-#      - name: Login to Azure
-#        uses: azure/login@v1
-#        with:
-#          creds: ${{ secrets.AZ_CRED }} # Service principal credentials
-#
-#      - name: Set up Kubectl
-#        uses: azure/setup-kubectl@v3
-#        # id: install # No id needed if not referencing output
-#
-#      - name: Get AKS Credentials
-#        uses: azure/aks-set-context@v3
-#        with:
-#          resource-group: ${{ secrets.AZ_RESOURCE_GROUP }} # Or use Terraform output
-#          cluster-name: ${{ secrets.AZ_AKS_CLUSTER_NAME }}   # Or use Terraform output
-#        # id: login # No id needed if not referencing output
-#
-#      - name: Setup Helm
-#        uses: azure/setup-helm@v3
-#        with:
-#          version: 'v3.x' # Specify Helm version
-#        # id: helm-install
-#
-#      # Placeholder for getting image tag from build job or other source
-#      # This would typically be an output from the build-and-push-docker.yml workflow
-#      # or a fixed tag like 'latest' if that's your strategy.
-#      - name: Set Image Tag
-#        id: image_tag
-#        run: echo "IMAGE_TAG=latest" >> $GITHUB_ENV # Replace 'latest' with actual tag
-#
-#      - name: Deploy PostgreSQL Helm Chart
-#        run: |
-#          helm upgrade --install postgresql-release ./helm/postgresql #            --namespace default #            --create-namespace #            --set postgresql.password=${{ secrets.DB_PASSWORD }} #            # Add other necessary values for postgresql chart
-#            --wait # Optional: wait for resources to be ready
-#
-#      - name: Deploy Sample API Helm Chart
-#        run: |
-#          helm upgrade --install sample-api-release ./helm/sample-api #            --namespace default #            --create-namespace #            --set image.tag=${{ env.IMAGE_TAG }} #            --set image.repository=${{ secrets.ACR_NAME }}.azurecr.io/sample-node-api \ # Replace with your ACR name logic
-#            --set postgresql.password=${{ secrets.DB_PASSWORD }} #            --set postgresql.host=postgresql-release-postgresql \ # Assuming postgresql chart release name is 'postgresql-release' and service is 'postgresql-release-postgresql'
-#            # Add other necessary values for sample-api chart
-#            --wait # Optional: wait for resources to be ready
-#
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Add environment if you use GitHub environments for protection rules/secrets
+    # environment: production 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZ_CRED }} # Service principal credentials
+
+      - name: Set up Kubectl
+        uses: azure/setup-kubectl@v3
+        # id: install # No id needed if not referencing output
+
+      - name: Get AKS Credentials
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AZ_RESOURCE_GROUP }} # Or use Terraform output
+          cluster-name: ${{ secrets.AZ_AKS_CLUSTER_NAME }}   # Or use Terraform output
+        # id: login # No id needed if not referencing output
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.x' # Specify Helm version
+        # id: helm-install
+
+      - name: Set Image Tag
+        id: image_tag
+        run: echo "IMAGE_TAG=${{ github.event.inputs.image_tag }}" >> $GITHUB_ENV
+
+      - name: Deploy PostgreSQL Helm Chart
+        run: |
+          helm upgrade --install postgresql-release ./helm/postgresql \
+            --namespace default \
+            --create-namespace \
+            --set postgresql.password=${{ secrets.DB_PASSWORD }} \
+            --wait # Optional: wait for resources to be ready
+
+      - name: Deploy Sample API Helm Chart
+        run: |
+          helm upgrade --install sample-api-release ./helm/sample-api \
+            --namespace default \
+            --create-namespace \
+            --set image.tag=${{ env.IMAGE_TAG }} \
+            --set image.repository=${{ secrets.ACR_NAME }}.azurecr.io/sample-node-api \
+            --set postgresql.password=${{ secrets.DB_PASSWORD }} \
+            --set postgresql.host=postgresql-release-postgresql \
+            --wait # Optional: wait for resources to be ready
 #      # Placeholder for any post-deployment steps (e.g., smoke tests)
 #      # - name: Verify deployment
 #      #   run: |
