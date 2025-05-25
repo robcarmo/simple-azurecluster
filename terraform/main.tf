@@ -31,7 +31,7 @@ module "aks" {
   resource_group_name = data.azurerm_resource_group.existing_rg.name
   location            = data.azurerm_resource_group.existing_rg.location
   aks_cluster_name    = "aks-sample-cluster" # Example name
-  kubernetes_version  = "1.27.7"             # Example version
+  kubernetes_version  = "1.33.0" # Example version
   node_vm_size        = "Standard_DS2_v2"
   node_count          = 2
 }
