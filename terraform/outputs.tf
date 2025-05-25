@@ -1,6 +1,6 @@
 output "resource_group_name" {
   description = "The name of the main resource group."
-  value       = azurerm_resource_group.main.name
+  value       = data.azurerm_resource_group.existing_rg.name
 }
 
 output "aks_cluster_name" {
