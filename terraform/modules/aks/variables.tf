@@ -17,7 +17,7 @@ variable "aks_cluster_name" {
 variable "kubernetes_version" {
   description = "The version of Kubernetes to use for the AKS cluster."
   type        = string
-  default     = "1.32.0" // Check for latest stable versions
+  default     = "1.26.0" // Check for latest stable versions
 }
 
 variable "node_vm_size" {
