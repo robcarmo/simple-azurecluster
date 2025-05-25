@@ -9,7 +9,7 @@ on:
       - '.github/workflows/deploy-to-aks.yml'
       # Potentially trigger if the image build workflow runs successfully (workflow_run)
 
-jobs:
+#jobs:
 #  deploy:
 #    runs-on: ubuntu-latest
 #    # Add environment if you use GitHub environments for protection rules/secrets
