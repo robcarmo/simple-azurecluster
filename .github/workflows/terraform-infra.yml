@@ -1,13 +1,16 @@
 name: Terraform Infrastructure CI/CD
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'terraform/**'
-      - '.github/workflows/terraform-infra.yml'
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'The Terraform action to perform: apply or destroy'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
 
 jobs:
   deploy-infra:
@@ -39,6 +42,10 @@ jobs:
         if: always()
         run: terraform show -no-color tfplan
 
+      - name: Terraform Destroy
+        if: github.event.inputs.action == 'destroy' && github.ref == 'refs/heads/main'
+        run: terraform destroy -auto-approve
+
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'   
+        if: github.event.inputs.action == 'apply' && github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve -input=false tfplan

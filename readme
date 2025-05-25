@@ -226,6 +226,22 @@ The CI/CD pipelines are managed using GitHub Actions. The workflows are defined 
         *   Runs `terraform plan` to create an execution plan.
         *   Runs `terraform apply -auto-approve` to apply the changes to the infrastructure. This step is conditional and only runs on pushes to the `main` branch.
 
+### Manually Triggering the Terraform Workflow
+
+The Terraform infrastructure deployment (`Terraform Infrastructure CI/CD` workflow) has been configured for manual triggering, providing direct control over when infrastructure changes are applied or destroyed.
+
+To manually run this workflow:
+
+1.  Navigate to the **Actions** tab of this GitHub repository.
+2.  In the left sidebar, click on the "**Terraform Infrastructure CI/CD**" workflow.
+3.  Above the list of workflow runs, click the "**Run workflow**" button (usually on the right side).
+4.  You will see a dropdown menu labeled "**The Terraform action to perform: apply or destroy**".
+    *   Choose `apply` to build or update the infrastructure as defined in the Terraform files.
+    *   Choose `destroy` to remove all infrastructure managed by this Terraform configuration.
+5.  Click the green "**Run workflow**" button to start the process.
+
+**Caution:** The `destroy` action will permanently delete your Azure infrastructure managed by this workflow. Use this option with extreme care and ensure you understand its consequences, especially in a production environment.
+
 2.  **Build and Push Docker Image (`build-and-push-docker.yml`) - Temporarily Disabled**
     *   **Original Purpose:** Builds the Docker image for the sample Node.js API and pushes it to Azure Container Registry (ACR).
     *   **Current Status:** This workflow is temporarily disabled by having its job steps commented out. The trigger is on pushes to `main` for changes in `app/**` or `app/Dockerfile`.
