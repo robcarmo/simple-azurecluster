@@ -29,4 +29,3 @@ jobs:
           tags: |
             ${{ secrets.ACR_NAME }}.azurecr.io/hello-world:${{ github.event.inputs.image_tag }}
             ${{ secrets.ACR_NAME }}.azurecr.io/hello-world:latest
-```
