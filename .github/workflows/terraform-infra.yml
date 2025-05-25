@@ -39,6 +39,14 @@ jobs:
         run: terraform init
         # No need for 'cd infra' if 'working-directory' is set at the job level
         # or step level correctly. Assuming TF files are directly in 'terraform' folder.
+      - name: Attempt to Import Resource Group (Use with Caution)
+        # This step is risky and generally not recommended for regular CI/CD
+        # It's better to import manually once.
+        # This tries to import and continues if it fails (e.g., already imported or doesn't exist to import)
+        run: |
+          terraform import azurerm_resource_group.main /subscriptions/0e1938d0-bd3f-4a45-9b14-8ac9a026e2d7/resourceGroups/cc-rg-new || echo "Import failed or resource already managed/not found, continuing..."
+        working-directory: ${{ moyennes.run.working-directory }} # Or your TF directory
+        continue-on-error: true # This is important if you expect failures
 
       # Terraform Plan
       - name: Terraform Plan
