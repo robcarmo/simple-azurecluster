@@ -210,6 +210,39 @@ log-analytics/: Placeholder for Azure Log Analytics workspace. (Disabled by defa
 
 Each module is designed to be reusable and is called from the root `main.tf`. Modules can be enabled or disabled using the `module_enabled` variable within their respective `variables.tf` files (or overridden from the root). This allows for a flexible infrastructure setup where components can be included or excluded as needed.
 
+### Terraform State Backend
+
+To enhance collaboration and secure the state of the infrastructure, this Terraform setup is configured to store its state file remotely in Azure Blob Storage. This prevents inconsistencies and provides a reliable source of truth for the infrastructure's current state.
+
+**Configuration Details:**
+
+The backend is configured in `terraform/main.tf` with the following settings:
+
+*   **Resource Group:** `tfstate-rg`
+*   **Storage Account Name:** `tfstatestoragecarmocloud`
+*   **Container Name:** `tfstate`
+*   **State File Name (Key):** `terraform.tfstate`
+
+**Prerequisites:**
+
+Before this backend configuration can be used, the following prerequisites must be met in Azure:
+
+1.  An Azure Resource Group named `tfstate-rg` must exist.
+2.  Within `tfstate-rg`, an Azure Storage Account named `tfstatestoragecarmocloud` must be created. (It's recommended this storage account be in the `eastus` region for consistency, though the backend configuration itself doesn't specify a region).
+3.  Within the `tfstatestoragecarmocloud` storage account, a Blob Container named `tfstate` must be created.
+4.  **Service Principal Permissions:** The Azure service principal used by the GitHub Actions workflow (configured via `secrets.AZ_CRED` in the repository) **must** be assigned the "Storage Blob Data Contributor" role (or "Storage Blob Data Owner") on the `tfstatestoragecarmocloud` storage account. This permission is essential for the workflow to read from and write the state file to the blob container. Without this, the `terraform init` and subsequent Terraform commands in the workflow will fail.
+
+**Initialization:**
+
+When running Terraform commands locally or when the workflow executes, `terraform init` must be run first in the `terraform/` directory. This command initializes the backend, downloading provider plugins and configuring the remote state.
+
+*   **Migrating Existing State:** If you were previously using a local `terraform.tfstate` file and are now switching to this remote backend, `terraform init` will detect the existing local state and ask if you want to copy it to the new Azure Blob Storage backend. You should typically answer "yes" to migrate your current state.
+*   **New Setup:** For a new setup where no state file exists, `terraform init` will simply initialize the backend without prompting for migration.
+
+**Workflow Integration:**
+
+The GitHub Actions workflow defined in `.github/workflows/terraform-infra.yml` automatically handles the initialization of this backend during its `Terraform Init` step. It will use the configured Azure credentials to authenticate and connect to the Azure Blob Storage backend.
+
 CI/CD Pipeline Explanation
 
 The CI/CD pipelines are managed using GitHub Actions. The workflows are defined in the `.github/workflows/` directory.
