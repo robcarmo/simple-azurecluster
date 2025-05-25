@@ -1,6 +1,6 @@
 output "resource_group_name" {
-  description = "The name of the main resource group."
-  value       = azurerm_resource_group.main.name
+  description = "The name of the selected resource group." # Updated description
+  value       = data.azurerm_resource_group.selected.name
 }
 
 output "aks_cluster_name" {
