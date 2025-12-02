@@ -37,3 +37,9 @@ variable "postgresql_admin_password_placeholder" {
   default     = "ReplaceThisSecurely123!"
   sensitive   = true
 }
+
+variable "postgresql_admin_password" {
+  description = "PostgreSQL admin password. Must be provided via environment variable TF_VAR_postgresql_admin_password or tfvars file."
+  type        = string
+  sensitive   = true
+}

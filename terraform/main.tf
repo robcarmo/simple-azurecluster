@@ -43,7 +43,7 @@ module "database" {
   location            = data.azurerm_resource_group.existing_rg.location
   postgresql_server_name = "psql-${var.resource_group_name}" # Example name
   postgresql_admin_login    = "psqladmin"
-  postgresql_admin_password = "Password123!" # Replace with a secure password, ideally from a variable or secret
+  postgresql_admin_password = var.postgresql_admin_password
   # Add other necessary variables like sku_name, storage_mb, version
 }
 

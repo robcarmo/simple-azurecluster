@@ -2,5 +2,7 @@
     "appId": "9599d518-8824-4904-ab94-e35efa96e515",
     "displayName": "gh-action-sp",
     "password": "WtA8Q~V.sY8Ev2o~AK5rLLHU9U413YPKTYvsRaec",
-    "tenant": "40d7d9c5-a375-4db1-8e00-8b0d8f13450d"
-  }
+    "tenant": "40d7d9c5-a375-4db1-8e00-8b0d8f13450d",
+    "subscriptionId": "0e1938d0-bd3f-4a45-9b14-8ac9a026e2d7"
+
+}
